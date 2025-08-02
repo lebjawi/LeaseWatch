@@ -18,7 +18,7 @@ from ..utils.data_processor import DataProcessor
 from ..utils.report_generator import ReportGenerator
 from ..utils.logger import Logger
 
-logger = Logger("ReportService")
+logger = Logger("ReportService", quiet=True)
 
 
 class ReportService:

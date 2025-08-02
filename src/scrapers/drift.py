@@ -10,7 +10,7 @@ from ..types.types import FloorPlan
 from ..utils.data_processor import DataProcessor
 from ..utils.logger import Logger
 
-logger = Logger("DriftScraper")
+logger = Logger("DriftScraper", quiet=True)
 
 
 async def scrape_drift() -> List[FloorPlan]:

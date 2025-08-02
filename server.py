@@ -189,6 +189,7 @@ async def init_app() -> web.Application:
     # Add routes
     app.router.add_get('/health', health_check)
     app.router.add_post('/scrape', run_scraping)
+    app.router.add_get('/scrape', run_scraping)  # Allow GET for convenience
     app.router.add_get('/data', get_latest_data)
     app.router.add_get('/report', get_report)
     app.router.add_get('/dates', get_available_dates)
@@ -203,6 +204,7 @@ async def init_app() -> web.Application:
             'endpoints': {
                 'GET /health': 'Health check',
                 'POST /scrape': 'Trigger apartment data scraping',
+                'GET /scrape': 'Trigger apartment data scraping (alternative)',
                 'GET /data': 'Get latest scraped data (optional ?date=YYYY-MM-DD)',
                 'GET /report': 'Get reports (optional ?type=daily|comparison|bedroom|availability&date=YYYY-MM-DD)',
                 'GET /dates': 'Get available data dates',

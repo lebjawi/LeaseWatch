@@ -11,7 +11,7 @@ from pathlib import Path
 from ..types.types import FloorPlan, DailyReport, PropertySummary, ScrapingResult
 from ..utils.logger import Logger
 
-logger = Logger("StorageService")
+logger = Logger("StorageService", quiet=True)
 
 
 class StorageService:

@@ -10,7 +10,7 @@ from ..types.types import FloorPlan
 from ..utils.data_processor import DataProcessor
 from ..utils.logger import Logger
 
-logger = Logger("CamdenScraper")
+logger = Logger("CamdenScraper", quiet=True)
 
 
 async def scrape_camden() -> List[FloorPlan]:

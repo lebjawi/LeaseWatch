@@ -10,7 +10,7 @@ from ..types.types import FloorPlan
 from ..utils.data_processor import DataProcessor
 from ..utils.logger import Logger
 
-logger = Logger("ColumnsScraper")
+logger = Logger("ColumnsScraper", quiet=True)
 
 
 async def scrape_columns() -> List[FloorPlan]:

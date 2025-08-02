@@ -15,8 +15,9 @@ class Logger:
     Centralized logger for LeaseWatch application
     """
     
-    def __init__(self, name: str = "LeaseWatch", log_file: Optional[str] = None):
+    def __init__(self, name: str = "LeaseWatch", log_file: Optional[str] = None, quiet: bool = False):
         self.logger = logging.getLogger(name)
+        self.quiet = quiet
         self.logger.setLevel(logging.INFO)
         
         # Avoid duplicate handlers
@@ -25,6 +26,9 @@ class Logger:
     
     def _setup_handlers(self, log_file: Optional[str] = None):
         """Setup console and file handlers"""
+        if self.quiet:
+            return  # Don't add any handlers in quiet mode
+            
         # Create formatter
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -50,7 +54,8 @@ class Logger:
     
     def info(self, message: str):
         """Log info message"""
-        self.logger.info(message)
+        if not self.quiet:
+            self.logger.info(message)
     
     def error(self, message: str):
         """Log error message"""
@@ -58,11 +63,13 @@ class Logger:
     
     def debug(self, message: str):
         """Log debug message"""
-        self.logger.debug(message)
+        if not self.quiet:
+            self.logger.debug(message)
     
     def warning(self, message: str):
         """Log warning message"""
-        self.logger.warning(message)
+        if not self.quiet:
+            self.logger.warning(message)
     
     def success(self, message: str):
         """Log success message (using info level)"""
