@@ -1,52 +1,65 @@
 /**
- * Type definitions for LeaseWatch application
+ * Enhanced Type definitions for LeaseWatch application
  */
 
 export interface FloorPlan {
   name: string;
-  price: string;
-  bedBathCount: string;
-  squareFootage: string;
+  price: number;
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  bedrooms: number;
+  bathrooms: number;
+  squareFootage: number;
+  pricePerSqFt: number;
   amenities: string[];
-  availability?: string;
-}
-
-export interface ApartmentUnit {
-  name: string;
-  beds: string;
-  baths: string;
-  price: string;
-  availability?: string;
-  squareFootage?: string;
-  floorPlan?: string;
+  availability: string;
+  moveInDate?: string;
+  propertyName: string;
+  propertyUrl: string;
+  description?: string;
+  unitType?: 'apartment' | 'townhome' | 'studio';
 }
 
 export interface ScrapingResult {
   success: boolean;
   message: string;
-  data: ApartmentUnit[];
   timestamp: string;
   source: string;
+  floorPlans: FloorPlan[];
+  errors: string[];
 }
 
-export interface CamdenUnit extends ApartmentUnit {
-  unitType: string;
-  moveInDate?: string;
-}
-
-export interface PerimeterUnit extends ApartmentUnit {
-  buildingName?: string;
-  unitNumber?: string;
+export interface PropertySummary {
+  propertyName: string;
+  totalFloorPlans: number;
+  priceRange: {
+    min: number;
+    max: number;
+  };
+  avgPricePerSqFt: number;
+  bedroomDistribution: {
+    studio: number;
+    oneBed: number;
+    twoBed: number;
+    threeBed: number;
+    fourPlusBed: number;
+  };
+  availableUnits: number;
 }
 
 export interface DailyReport {
   date: string;
-  camdenData: CamdenUnit[];
-  perimeterData: PerimeterUnit[];
-  summary: {
+  properties: PropertySummary[];
+  allFloorPlans: FloorPlan[];
+  marketSummary: {
     totalUnits: number;
-    avgPrice1Bed: string;
-    avgPrice2Bed: string;
+    avgRent: number;
+    avgPricePerSqFt: number;
+    cheapestUnit: FloorPlan;
+    mostExpensiveUnit: FloorPlan;
+    bestValueUnit: FloorPlan; // Lowest price per sq ft
   };
 }
 

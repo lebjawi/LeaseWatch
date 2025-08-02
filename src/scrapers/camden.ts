@@ -3,10 +3,11 @@
  * Handles scraping apartment data from Camden Living website
  */
 
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 import { FloorPlan } from '../types/types';
+import { DataProcessor } from '../utils/dataProcessor';
 
-export async function scrapeCamden(): Promise<void> {
+export async function scrapeCamden(): Promise<FloorPlan[]> {
   console.log('🏢 Scraping Camden...');
   
   let browser;
@@ -14,15 +15,16 @@ export async function scrapeCamden(): Promise<void> {
   try {
     // Launch browser
     console.log('🚀 Launching Camden browser...');
-    browser = await puppeteer.launch({
-      headless: false, // Show browser window for inspection
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    browser = await chromium.launch({
+      headless: true // Run in headless mode
     });
     
     const page = await browser.newPage();
     
     // Set user agent to avoid detection
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    await page.setExtraHTTPHeaders({
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    });
     
     console.log('📍 Navigating to Camden Dunwoody website...');
     
@@ -48,19 +50,13 @@ export async function scrapeCamden(): Promise<void> {
     const floorPlans = await extractCamdenFloorPlans(page);
     
     // Log the extracted data
-    console.log(`📊 Found ${floorPlans.length} floor plans:`);
-    floorPlans.forEach((plan, index) => {
-      console.log(`\n🏠 Floor Plan ${index + 1}:`);
-      console.log(`   Name: ${plan.name}`);
-      console.log(`   Price: ${plan.price}`);
-      console.log(`   Bed/Bath: ${plan.bedBathCount}`);
-      console.log(`   Square Footage: ${plan.squareFootage}`);
-      console.log(`   Available: ${plan.availability}`);
-      console.log(`   Amenities: ${plan.amenities.join(', ') || 'None listed'}`);
-    });
+    console.log(`📊 Found ${floorPlans.length} floor plans`);
+    
+    return floorPlans;
     
   } catch (error) {
     console.error('❌ Error scraping Camden:', error instanceof Error ? error.message : 'Unknown error');
+    return [];
   } finally {
     if (browser) {
       await browser.close();
@@ -108,7 +104,7 @@ async function extractCamdenFloorPlans(page: any): Promise<FloorPlan[]> {
       console.log('⚠️ Could not navigate to amenities section, will extract from floor plan cards only');
     }
     
-    const floorPlans = await page.evaluate((communityAmenities: string[]) => {
+    const rawFloorPlans = await page.evaluate((communityAmenities: string[]) => {
       // Get all floor plan cards using the actual Camden class structure
       const floorPlanCards = Array.from(document.querySelectorAll('.floorplan-card, [class*="floorplan-card"]'));
       
@@ -319,7 +315,34 @@ async function extractCamdenFloorPlans(page: any): Promise<FloorPlan[]> {
       );
     }, communityAmenities); // Pass communityAmenities to the page.evaluate function
     
-    return floorPlans;
+    // Process the raw data into enhanced FloorPlan objects
+    const enhancedFloorPlans: FloorPlan[] = rawFloorPlans.map((rawPlan: any) => {
+      const price = DataProcessor.parsePrice(rawPlan.price);
+      const bedrooms = DataProcessor.parseBedrooms(rawPlan.bedBathCount);
+      const bathrooms = DataProcessor.parseBathrooms(rawPlan.bedBathCount);
+      const squareFootage = DataProcessor.parseSquareFootage(rawPlan.squareFootage);
+      const cleanName = DataProcessor.cleanFloorPlanName(rawPlan.name);
+      const unitType = DataProcessor.determineUnitType(rawPlan.name, bathrooms);
+      const pricePerSqFt = DataProcessor.calculatePricePerSqFt(price, squareFootage);
+      const availability = DataProcessor.standardizeAvailability(rawPlan.availability);
+      
+      return {
+        name: cleanName,
+        price: price,
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        squareFootage: squareFootage,
+        pricePerSqFt: pricePerSqFt,
+        amenities: rawPlan.amenities,
+        availability: availability,
+        propertyName: 'Camden Dunwoody',
+        propertyUrl: 'https://www.camdenliving.com/apartments/dunwoody-ga/camden-dunwoody/available-apartments',
+        unitType: unitType,
+        moveInDate: rawPlan.availability.match(/\d{1,2}\/\d{1,2}\/\d{4}/) ? rawPlan.availability : undefined
+      };
+    });
+    
+    return enhancedFloorPlans;
   } catch (error) {
     console.error('❌ Error extracting Camden floor plans:', error);
     return [];
