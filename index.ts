@@ -5,6 +5,7 @@
 
 import { scrapeCamden } from './src/scrapers/camden';
 import { scrapeColumns } from './src/scrapers/columns';
+import { scrapeDrift } from './src/scrapers/drift';
 import { DataProcessor } from './src/utils/dataProcessor';
 import { ReportGenerator } from './src/utils/reportGenerator';
 import { FloorPlan, ScrapingResult } from './src/types/types';
@@ -62,6 +63,29 @@ async function main(): Promise<void> {
         message: `Columns scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: new Date().toISOString(),
         source: 'The Columns at Lake Ridge',
+        floorPlans: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      });
+    }
+    
+    try {
+      const driftPlans = await scrapeDrift();
+      allFloorPlans.push(...driftPlans);
+      scrapingResults.push({
+        success: true,
+        message: 'Drift scraping completed successfully',
+        timestamp: new Date().toISOString(),
+        source: 'Drift Dunwoody',
+        floorPlans: driftPlans,
+        errors: []
+      });
+    } catch (error) {
+      console.error('❌ Drift scraping failed:', error);
+      scrapingResults.push({
+        success: false,
+        message: `Drift scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+        source: 'Drift Dunwoody',
         floorPlans: [],
         errors: [error instanceof Error ? error.message : 'Unknown error']
       });
