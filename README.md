@@ -1,26 +1,33 @@
 # 🏡 LeaseWatch
 
-**Automated Apartment Pricing Tracker for Camden Dunwoody & Perimeter Gardens**  
-Track live floor plan pricing daily using Puppeteer and cloud automation.
+**Automated Apartment Pricing Tracker for Camden Dunwoody & Perimeter Gardens**
+
+> "Stop hunting for deals. Start watching them."
+
+Track live floor plan pricing daily using Puppeteer and cloud automation with **zero manual work**.
 
 ---
 
-## 📌 Project Overview
+## 📌 Overview
 
-**LeaseWatch** is a Node.js-based backend project that monitors apartment pricing daily for select luxury apartment communities.  
-It uses **Puppeteer** to scrape dynamic floor plan pricing and outputs logs or reports for 1B/1B and 2B/2B units — so you never have to check manually again.
+**LeaseWatch** is a Node.js-based backend project that monitors apartment pricing daily for luxury apartment communities. It uses **Puppeteer** to scrape dynamic floor plan pricing and outputs logs or reports for 1B/1B and 2B/2B units.
 
-This MVP focuses on:
-- **Camden Dunwoody**  
+**Current Target Properties:**
+- **Camden Dunwoody**
 - **Perimeter Gardens at Georgetown**
 
 ---
 
-## 🎯 Vision
+## 🔧 Tech Stack
 
-> "Stop hunting for deals. Start watching them."
-
-LeaseWatch aims to be the go-to automation tool for renters, real estate investors, and housing researchers who want **real-time, reliable** rental pricing updates with **zero manual work**.
+| Component | Technology |
+|-----------|------------|
+| Backend | Node.js |
+| Headless Browser | Puppeteer |
+| Scheduler | Render Cron Job |
+| Storage | Local JSON (Supabase future) |
+| Notification | SendGrid (Phase 3) |
+| Logging | Console / Winston |
 
 ---
 
@@ -57,17 +64,13 @@ LeaseWatch aims to be the go-to automation tool for renters, real estate investo
 | - Email                |
 | - Webhook              |
 +------------------------+
-🔧 Tech Stack
-Component	Tech
-Backend	Node.js
-Headless Browser	Puppeteer
-Scheduler	Render Cron Job
-Storage	Local JSON (or Supabase later)
-Notification	SendGrid (Phase 3)
-Logging	Console / Winston
+```
 
-📁 Folder Structure
+---
 
+## 📁 Project Structure
+
+```
 leasewatch/
 ├── scrapers/
 │   ├── camden.js
@@ -83,7 +86,159 @@ leasewatch/
 ├── package.json
 ├── render.yaml
 └── README.md
-🚀 Phased Development Plan
+---
+
+## 🚀 Development Roadmap
+
+### 🟢 Phase 1 – Open Pages Daily (MVP)
+**Goal:** Launch Puppeteer, navigate to each target apartment's main floor plan page.
+
+- [x] Set up Puppeteer headless browser
+- [ ] Navigate to target sites:
+  - **Camden Dunwoody:** https://www.camdenliving.com/apartments/dunwoody-ga/camden-dunwoody/available-apartments
+  - **Perimeter Gardens:** https://www.perimetergardens.com/interactivepropertymap
+- [ ] Log success/failure
+- [ ] Deploy to Render with daily cron job
+
+### 🟡 Phase 2 – Extract Floor Plans & Prices
+**Goal:** Scrape all 1B/1B and 2B/2B prices to console
+
+- [ ] Parse floor plans on each site
+- [ ] Filter by bed/bath configuration
+- [ ] Extract plan name, price, and availability
+- [ ] Output structured logs in console
+- [ ] Save to `data/prices.json`
+
+### 🟣 Phase 3 – Generate & Deliver Reports
+**Goal:** Automate reporting + delivery
+
+- [ ] Format results into structured reports (JSON/CSV)
+- [ ] Choose delivery method:
+  - [ ] Send email (SendGrid integration)
+  - [ ] Save to cloud folder (Dropbox, Google Drive API)
+  - [ ] Optional: webhook/Slack/Discord
+- [ ] Add timestamps to reports
+- [ ] Optional: Create historical log file
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Local Development
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/leasewatch.git
+   cd leasewatch
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the script locally:**
+   ```bash
+   node index.js
+   ```
+
+### Deployment on Render
+
+1. Push code to GitHub
+2. Log into [Render.com](https://render.com)
+3. Create new "Background Worker" → Link your repo
+4. Add build/run command: `node index.js`
+5. Set Cron Job schedule to `@daily`
+
+---
+
+## 📦 Data Output Format
+
+**Example output (Phase 2 & 3):**
+
+```json
+{
+  "date": "2025-08-02T05:00:00Z",
+  "camdenData": [
+    {
+      "name": "Dogwood",
+      "beds": "1 Bed / 1 Bath",
+      "price": "$1,480"
+    },
+    {
+      "name": "Chestnut",
+      "beds": "2 Bed / 2 Bath",
+      "price": "$1,750"
+    }
+  ],
+  "perimeterData": [
+    {
+      "name": "Concourse A2",
+      "price": "$1,435",
+      "availability": "Available Now"
+    }
+  ]
+}
+```
+
+---
+
+## � Notifications (Phase 3)
+
+Available delivery methods:
+- 💌 **Email** (SendGrid integration)
+- 📤 **Webhook** to Slack/Notion/Discord
+- 🧾 **Local file** dump (JSON/CSV)
+
+---
+
+## 🔒 Security
+
+⚠️ **Important:** Store sensitive information using environment variables or `.env` files:
+- SendGrid API keys
+- Database credentials
+- Webhook URLs
+
+**Never hardcode credentials in your scripts.**
+
+---
+
+## 💡 Future Enhancements
+
+- [ ] Historical price trends & visualization
+- [ ] Add more apartment communities
+- [ ] Rent drop alerts
+- [ ] Personal dashboard UI (React + Chart.js)
+- [ ] Mobile app notifications
+- [ ] Price prediction algorithms
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🧠 About
+
+Created with love and frustration by someone who refuses to get ripped off by rent hikes.
+
+**LeaseWatch** aims to be the go-to automation tool for renters, real estate investors, and housing researchers who want **real-time, reliable** rental pricing updates.
 🟢 Phase 1 – Open Pages Daily (MVP)
 Goal: Launch Puppeteer, navigate to each target apartment's main floor plan page.
 
