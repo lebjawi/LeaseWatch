@@ -1,0 +1,2 @@
+# This file ensures the daily data directory is tracked in git
+# while keeping the actual data files ignored
